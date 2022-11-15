@@ -21,6 +21,12 @@ public class Rock : MonoBehaviour
     private GameObject go_debris;   // 깨진 바위 파편
     [SerializeField]
     private GameObject go_effect_prefabs;    // 바위 채굴시 나오는 이펙트
+    [SerializeField]
+    private GameObject go_rock_item_prefab;     // 돌맹이 아이템(재료)
+
+    // 돌맹이 아이템(재료) 생성 개수
+    [SerializeField]
+    private int count;
 
     //// 사운드 관련 컴포넌트
     //[SerializeField]
@@ -57,6 +63,11 @@ public class Rock : MonoBehaviour
 
         SoundManager.instance.PlaySE(destroy_Sound);            // 바위 부서진 후 채굴 사운드 재생
         col.enabled = false;                    // 콜라이더 제거
+        
+        for(int i =0; i <= count; i++)          // 돌맹이 아이템(재료)를 count 수 만큼 생성
+        {
+            Instantiate(go_rock_item_prefab, go_rock.transform.position, Quaternion.identity);
+        }
         Destroy(go_rock);                       // 바위 본체 제거
 
         go_debris.SetActive(true);              // 바위 파편 생성

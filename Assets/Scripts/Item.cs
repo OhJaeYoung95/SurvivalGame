@@ -4,6 +4,7 @@ using UnityEngine;
 
 // ScriptableObject : 게임 오브젝트에 부착할 필요가 없는 오브젝트를 만들기 위해서 사용
 // [CreateAssetMenu] : Project창에서 우클릭시 New Item이란 창이 생기고 item이란 란이 생겨서 아이템을 만들수 있는 수단이 생김
+// [CreateAssetMenu] : Project창에서 우클릭시 menuName 에 있는 New Item -> item 경로가 생김, 생성된 파일 이름은 fileName에 있는 New Item으로 생성
 [CreateAssetMenu(fileName = "New Item", menuName = "New Item/item")]
 public class Item : ScriptableObject
 {

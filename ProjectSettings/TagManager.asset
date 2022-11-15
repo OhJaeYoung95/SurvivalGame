@@ -8,11 +8,12 @@ TagManager:
   - Twig
   - Grass
   - Tree
+  - Item
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Item
   - Water
   - UI
   - Weapon
