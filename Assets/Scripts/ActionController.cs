@@ -18,6 +18,8 @@ public class ActionController : MonoBehaviour
     // 필요한 컴포넌트
     [SerializeField]
     private Text actionText;            // 액션에 쓰이는 텍스트
+    [SerializeField]
+    private Inventory theInventory;     // 아이템 획득에 쓰일 인벤토리
 
     // Update is called once per frame
     void Update()
@@ -42,6 +44,7 @@ public class ActionController : MonoBehaviour
             if(hitInfo.transform != null)       // Raycast광선에 충돌 물체가 있다면
             {
                 Debug.Log(hitInfo.transform.GetComponent<ItemPickUp>().item.itemName + " 획득했습니다");      // 아이템 획득여부 콘솔창에 띄어줌
+                theInventory.AcquireItem(hitInfo.transform.GetComponent<ItemPickUp>().item);        // 충돌 물체 아이템 인벤토리에 획득
                 Destroy(hitInfo.transform.gameObject);          // 아이템 게임오브젝트 제거
                 InfoDisappear();                                // 아이템 획득시 아이템 정보 비활성화
             }
