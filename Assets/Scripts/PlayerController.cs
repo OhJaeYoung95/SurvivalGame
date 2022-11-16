@@ -87,8 +87,11 @@ public class PlayerController : MonoBehaviour
         TryCrouch();
         Move();
         MoveCheck();
-        CameraRotation();
-        CharacterRotation();
+        if(!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
+        {
+            CameraRotation();
+            CharacterRotation();
+        }
     }
 
     private void TryCrouch() // 앉기 시도

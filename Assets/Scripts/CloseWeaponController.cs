@@ -28,25 +28,28 @@ public abstract class CloseWeaponController : MonoBehaviour
     }
     protected void TryAttack()    // 공격 시도하는 함수
     {
-        if (Input.GetButton("Fire1"))
+        if (!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
         {
-            if (!isAttack)
+            if (Input.GetButton("Fire1"))       // 마우스 좌클릭
             {
-                if(CheckObject())           // 공격이 닿았는지 확인,
-                {                                                                           //(작업인지 확인)
-                    if (currentCloseWeapon.isAxe && hitInfo.transform.tag == "Tree")        // 휘두르는 무기가 도끼이고, 공격이 닿은 물체가 나무인지 확인
-                    {
-                        //StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.position));      // 나무를 칠때 나무를 바라보게 해줌
-                        StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.GetComponent<TreeComponent>().GetTreeCenterPosition()));      // 나무를 칠때 나무를 바라보게 해줌
-                        StartCoroutine(AttackCoroutine("Chop", currentCloseWeapon.workDelayA,         // 맞다면 Chop 애니메이션 실행
-                        currentCloseWeapon.workDelayB,
-                        currentCloseWeapon.workDelay - currentCloseWeapon.workDelayA - currentCloseWeapon.workDelayB));
-                        return;         // 밑에 코루틴이 중복실행될 수 있기에 return으로 함수 종료
+                if (!isAttack)
+                {
+                    if (CheckObject())           // 공격이 닿았는지 확인,
+                    {                                                                           //(작업인지 확인)
+                        if (currentCloseWeapon.isAxe && hitInfo.transform.tag == "Tree")        // 휘두르는 무기가 도끼이고, 공격이 닿은 물체가 나무인지 확인
+                        {
+                            //StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.position));      // 나무를 칠때 나무를 바라보게 해줌
+                            StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.GetComponent<TreeComponent>().GetTreeCenterPosition()));      // 나무를 칠때 나무를 바라보게 해줌
+                            StartCoroutine(AttackCoroutine("Chop", currentCloseWeapon.workDelayA,         // 맞다면 Chop 애니메이션 실행
+                            currentCloseWeapon.workDelayB,
+                            currentCloseWeapon.workDelay - currentCloseWeapon.workDelayA - currentCloseWeapon.workDelayB));
+                            return;         // 밑에 코루틴이 중복실행될 수 있기에 return으로 함수 종료
+                        }
                     }
+                    StartCoroutine(AttackCoroutine("Attack", currentCloseWeapon.attackDelayA,   // 공격
+                        currentCloseWeapon.attackDelayB,
+                        currentCloseWeapon.attackDelay - currentCloseWeapon.attackDelayA - currentCloseWeapon.attackDelayB));
                 }
-                StartCoroutine(AttackCoroutine("Attack", currentCloseWeapon.attackDelayA,   // 공격
-                    currentCloseWeapon.attackDelayB, 
-                    currentCloseWeapon.attackDelay - currentCloseWeapon.attackDelayA - currentCloseWeapon.attackDelayB));
             }
         }
     }

@@ -41,12 +41,15 @@ public class GunController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isActivate)
+        if (!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
         {
-            GunFireRateCalc();
-            TryFire();
-            TryReload();
-            TryFineSight();
+            if (isActivate)
+            {
+                GunFireRateCalc();
+                TryFire();
+                TryReload();
+                TryFineSight();
+            }
         }
     }
 

@@ -35,12 +35,13 @@ public class WeaponSway : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        TrySway();
+        if(!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
+            TrySway();
     }
 
     private void TrySway()
     {
-        if (Input.GetAxisRaw("Mouse X") != 0 || Input.GetAxisRaw("Mouse Y") != 0)
+        if(Input.GetAxisRaw("Mouse X") != 0 || Input.GetAxisRaw("Mouse Y") != 0)
         {
             Swaying();
         }

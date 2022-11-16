@@ -6,8 +6,6 @@ using UnityEngine.EventSystems;
 
 public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    private Vector3 originPos;  // 마우스 이벤트시 필요한 원래 위치
-
     public Item item;           // 획득한 아이템의 정보를 가져오기 위한 Item 변수
     public int itemCount;       // 획득한 아이템 수량
     public Image itemImage;     // 아이템의 이미지
@@ -25,7 +23,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     void Start()
     {
-        originPos = transform.position;
         theWeaponManager = FindObjectOfType<WeaponManager>();
     }
     private void SetColor(float _alpha)         // 아이템 슬롯 활성화, 비활성화  / 투명도 조절
@@ -96,29 +93,48 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
         }
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData eventData)         // 드래그 시작
     {
         if(item != null)
         {
-            transform.position = eventData.position;        // 슬롯의 위치를 이벤트가 발생한 위치로 바꾼다
+            DragSlot.instance.dragSlot = this;               // DragSlot instance에 자기 자신을 대입
+            DragSlot.instance.DragSetImage(itemImage);          // 드래그 하는 이미지 활성화
+            DragSlot.instance.transform.position = eventData.position;        // 드래그 하는 슬롯의 위치를 이벤트가 발생한 위치로 바꾼다
         }
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData eventData)              // 드래그 중
     {
         if (item != null)
         {
-            transform.position = eventData.position;        // 슬롯의 위치를 이벤트가 발생한 위치로 바꾼다
+            DragSlot.instance.transform.position = eventData.position;     // 드래그 하는 슬롯의 위치를 이벤트가 발생한 위치로 바꾼다
         }
 
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData eventData)           // 드래그가 끝나기만 하면 호출됨
     {
-        transform.position = originPos;
+        DragSlot.instance.SetColor(0);              // instance 객체 비활성화
+        DragSlot.instance.dragSlot = null;          // dragSlot 객체 제거
     }
 
-    public void OnDrop(PointerEventData eventData)
+    public void OnDrop(PointerEventData eventData)              // 다른 슬롯위에서 드래그가 끝났을때만 호출
     {
+        if(DragSlot.instance.dragSlot != null)          // 드래그 슬롯에 아이템이 있을때
+            ChangeSlot();                               // 슬롯 변경         
+    }
+
+    private void ChangeSlot()               // 슬롯 변경
+    {
+        // 슬롯 변경전 원래 있던 곳의 아이템 임시로 복사
+        Item _tempItem = item;
+        int _tempItemCount = itemCount;
+
+        AddItem(DragSlot.instance.dragSlot.item, DragSlot.instance.dragSlot.itemCount);
+
+        if (_tempItem != null)      // 원래 있던곳에 아이템이 있다면
+            DragSlot.instance.dragSlot.AddItem(_tempItem, _tempItemCount);      // 임시 복사본 아이템 붙여넣기, 드래그 시작했던 자리로 옮기기
+        else                        // 원래 있던곳에 아이템이 없다면
+            DragSlot.instance.dragSlot.ClearSlot();         // 슬롯 초기화
     }
 }
