@@ -164,6 +164,13 @@ public class StatusController : MonoBehaviour
             currentDp += _count;
         else
             currentDp = dp;
+    }   
+    public void IncreaseSP(int _count)          // SP 증가 함수
+    {
+        if (currentSp + _count < sp)
+            currentSp += _count;
+        else
+            currentSp = sp;
     }
 
     public void DecreaseDP(int _count)          // DP 감소 함수
