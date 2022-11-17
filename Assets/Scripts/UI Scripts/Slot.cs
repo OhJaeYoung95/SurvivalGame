@@ -20,10 +20,14 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     // 하지만 다른 객체들을 끌어올 수 는 없기에 이와 같이 Start 함수에서 초기화 하면서 대입해줘야 한다.
     // 이미 하이어라키에 꺼내 놓은 프리팹 객체는 가능하지만 Instantiate()로 생성했을 경우에 해당된다.
     private WeaponManager theWeaponManager;     // 총 장착을 위한 WeaponManager 변수
+    private Rect baseRect;                  // 인벤토리 베이스의 좌표 값
+    private InputNumber theInputNumber;     // 아이템 버리는 갯수 창(인풋필드) 컨트롤을 위한 변수                                        
 
     void Start()
     {
+        baseRect = transform.parent.parent.GetComponent<RectTransform>().rect;      // 인벤토리 베이스의 rect 값 대입
         theWeaponManager = FindObjectOfType<WeaponManager>();
+        theInputNumber = FindObjectOfType<InputNumber>();
     }
     private void SetColor(float _alpha)         // 아이템 슬롯 활성화, 비활성화  / 투명도 조절
     {
@@ -114,8 +118,20 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     public void OnEndDrag(PointerEventData eventData)           // 드래그가 끝나기만 하면 호출됨
     {
-        DragSlot.instance.SetColor(0);              // instance 객체 비활성화
-        DragSlot.instance.dragSlot = null;          // dragSlot 객체 제거
+        // 인벤토리 영역 밖이라면
+        if (DragSlot.instance.transform.localPosition.x < baseRect.xMin || DragSlot.instance.dragSlot.transform.localPosition.x > baseRect.xMax
+            || DragSlot.instance.transform.localPosition.y < baseRect.yMin || DragSlot.instance.dragSlot.transform.localPosition.y > baseRect.yMax)
+        {
+            if(DragSlot.instance.dragSlot != null)      // 드래그한 슬롯이 빈칸이 아니라면
+            {
+                theInputNumber.Call();                  //아이템 버리는 갯수 창(인풋필드) 활성화      
+            }
+        }
+        else        // 인벤토리 영역 안이라면
+        {
+            DragSlot.instance.SetColor(0);              // instance 객체 비활성화
+            DragSlot.instance.dragSlot = null;          // dragSlot 객체 제거
+        }
     }
 
     public void OnDrop(PointerEventData eventData)              // 다른 슬롯위에서 드래그가 끝났을때만 호출

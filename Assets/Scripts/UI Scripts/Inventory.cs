@@ -39,6 +39,11 @@ public class Inventory : MonoBehaviour
             else
                 CloseInventory();
         }
+        if(Input.GetKeyDown(KeyCode.Escape))        // ESC 누르면 인벤토리 비활성화
+        {
+            inventoryActivated = false;
+            CloseInventory();
+        }
     }
 
     private void OpenInventory()        // 인벤토리 활성화

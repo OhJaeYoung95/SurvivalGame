@@ -16,6 +16,14 @@ public class Grass : MonoBehaviour
     [SerializeField]
     private GameObject go_hit_effect_prefab;        // 타격 효과
 
+    // 나뭇잎 아이템을 인벤토리에 넣기 위한 컴포넌트들
+    [SerializeField]
+    private Item item_leaf;
+    [SerializeField]
+    private int lleafCount;
+    private Inventory theInven;
+
+
     // 풀 안에 있는 나뉘어져 있는 작은 풀잎들의 Rigidbody와 BoxCollider를 활성화 시키기 위한 변수들
     private Rigidbody[] rigidbodys;                 // Rigidbody 배열
     private BoxCollider[] boxColliders;             // BoxCollider 배열
@@ -26,6 +34,7 @@ public class Grass : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        theInven = FindObjectOfType<Inventory>();
         rigidbodys = this.transform.GetComponentsInChildren<Rigidbody>();       // 이 객체의 자식들에 있는 Rigidbody컴포넌트 정보를 가져온다.
         boxColliders = transform.GetComponentsInChildren<BoxCollider>();   // 이 객체의 자식들에 있는 BoxCollider컴포넌트 정보를 가져온다. 
     }
@@ -52,6 +61,7 @@ public class Grass : MonoBehaviour
 
     private void Destruction()      // 파손시 발생하는 함수
     {
+        theInven.AcquireItem(item_leaf, lleafCount);        // 나뭇잎 아이템 획득
         for (int i = 0; i < rigidbodys.Length; i++)
         {
             rigidbodys[i].useGravity = true;                                       // 중력 생성
