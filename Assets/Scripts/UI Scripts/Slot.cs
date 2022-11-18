@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     public Item item;           // 획득한 아이템의 정보를 가져오기 위한 Item 변수
     public int itemCount;       // 획득한 아이템 수량
@@ -18,15 +18,19 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     // 프리팹으로 된 객체들은 자기 자신안의 있는 자식들만 [SerializeField]로 정보를 가져올 수 있다
     // 하지만 다른 객체들을 끌어올 수 는 없기에 이와 같이 Start 함수에서 초기화 하면서 대입해줘야 한다.
-    // 이미 하이어라키에 꺼내 놓은 프리팹 객체는 가능하지만 Instantiate()로 생성했을 경우에 해당된다.
-    private WeaponManager theWeaponManager;     // 총 장착을 위한 WeaponManager 변수
-    private Rect baseRect;                  // 인벤토리 베이스의 좌표 값
+    // 이미 하이어라키에 꺼내 놓은 프리팹 객체는 개별적으로 넣을순 있지만
+    // Instantiate()로 생성했을 경우에는 넣어지지 않는다.
+    // 하이어라키에 꺼내 놓은 프리팹객체에 개별적으로 넣고 Aplly All을 해도
+    // 다른 프리팹 객체에는 적용되지 않는다.
+    [SerializeField]
+    private RectTransform baseRect;                  // 인벤토리 영역
     private InputNumber theInputNumber;     // 아이템 버리는 갯수 창(인풋필드) 컨트롤을 위한 변수                                        
-
+    private ItemEffectDatabase theItemEffectDatabase;       // 아이템 사용효과 이펙트를 위한 변수
+    [SerializeField]
+    private RectTransform quickSlotBaseRect;        // 퀵슬롯 영역
     void Start()
     {
-        baseRect = transform.parent.parent.GetComponent<RectTransform>().rect;      // 인벤토리 베이스의 rect 값 대입
-        theWeaponManager = FindObjectOfType<WeaponManager>();
+        theItemEffectDatabase = FindObjectOfType<ItemEffectDatabase>();
         theInputNumber = FindObjectOfType<InputNumber>();
     }
     private void SetColor(float _alpha)         // 아이템 슬롯 활성화, 비활성화  / 투명도 조절
@@ -82,17 +86,9 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
         {
             if(item != null)            // 아이템이 있다면
             {
-                if(item.itemType == Item.ItemType.Equipment)        // 장비 아이템이라면
-                {
-                    // 장착
-                    StartCoroutine(theWeaponManager.ChangeWeaponCoroutine(item.weaponType, item.itemName)); // WeaponManager에 무기교체 코루틴 함수 실행
-                }
-                else                    // 장비 아이템이 아니라면
-                {
-                    // 소모
-                    Debug.Log(item.itemName + " 을 사용했습니다");
-                    SetSlotCount(-1);
-                }
+                    theItemEffectDatabase.UseItem(item);        // 아이템 사용 효과
+                if(item.itemType == Item.ItemType.Used)         // 아이템 타입이 소모품이라면
+                    SetSlotCount(-1);       // 아이템 수량 1 소모
             }
         }
     }
@@ -118,9 +114,13 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     public void OnEndDrag(PointerEventData eventData)           // 드래그가 끝나기만 하면 호출됨
     {
-        // 인벤토리 영역 밖이라면
-        if (DragSlot.instance.transform.localPosition.x < baseRect.xMin || DragSlot.instance.dragSlot.transform.localPosition.x > baseRect.xMax
-            || DragSlot.instance.transform.localPosition.y < baseRect.yMin || DragSlot.instance.dragSlot.transform.localPosition.y > baseRect.yMax)
+        // !(인벤토리 영역 || // 퀵슬롯 영역), 인벤토리와 퀵슬롯 영역이 아니라면
+        if (!(((DragSlot.instance.transform.localPosition.x > baseRect.rect.xMin && DragSlot.instance.dragSlot.transform.localPosition.x < baseRect.rect.xMax
+            && DragSlot.instance.transform.localPosition.y > baseRect.rect.yMin && DragSlot.instance.dragSlot.transform.localPosition.y < baseRect.rect.yMax))
+            ||   
+            (DragSlot.instance.transform.localPosition.x > quickSlotBaseRect.rect.xMin && DragSlot.instance.dragSlot.transform.localPosition.x < quickSlotBaseRect.rect.xMax
+            && DragSlot.instance.transform.localPosition.y < quickSlotBaseRect.transform.localPosition.y -quickSlotBaseRect.rect.yMin 
+            && DragSlot.instance.dragSlot.transform.localPosition.y > quickSlotBaseRect.transform.localPosition.y - quickSlotBaseRect.rect.yMax)))
         {
             if(DragSlot.instance.dragSlot != null)      // 드래그한 슬롯이 빈칸이 아니라면
             {
@@ -152,5 +152,16 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
             DragSlot.instance.dragSlot.AddItem(_tempItem, _tempItemCount);      // 임시 복사본 아이템 붙여넣기, 드래그 시작했던 자리로 옮기기
         else                        // 원래 있던곳에 아이템이 없다면
             DragSlot.instance.dragSlot.ClearSlot();         // 슬롯 초기화
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)     // 마우스가 슬롯에 들어갈때 발동
+    {
+        if(item !=null)                 // 아이템이 있다면
+            theItemEffectDatabase.ShowToolTip(item, transform.position);            // 아이템 툴팁 활성화
+    }
+
+    public void OnPointerExit(PointerEventData eventData)     // 마우스가 슬롯에서 빠져나갈 때 발동
+    {
+        theItemEffectDatabase.HideToolTip();            // 아이템 툴팁 비활성화
     }
 }

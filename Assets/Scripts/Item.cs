@@ -13,6 +13,8 @@ public class Item : ScriptableObject
     // Sprite : 월드상에서도 이미지 출력 가능
 
     public string itemName;                // 아이템 이름
+    [TextArea]      // 여러줄 사용 가능
+    public string itemDesc;                // 아이템 설명
     public ItemType itemType;              // 아이템 유형
     public Sprite itemImage;               // 아이템 이미지
     public GameObject itemPrefab;          // 아이템 프리팹
