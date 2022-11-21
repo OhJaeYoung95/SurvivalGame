@@ -33,8 +33,8 @@ public class InputNumber : MonoBehaviour
 
     public void Call()              // 아이템 버리는 갯수 창(인풋필드) 활성화
     {
-        go_Base.SetActive(true);
         activated = true;            // 인풋창이 활성화 되었다는 Bool 값
+        go_Base.SetActive(true);
         if_text.text = "";           // 아이템 버릴 개수 텍스트 내용 초기화
         text_Preview.text = DragSlot.instance.dragSlot.itemCount.ToString();        // 아이템 최대개수 값 설정(문자열로 변환),
     }
@@ -80,6 +80,10 @@ public class InputNumber : MonoBehaviour
             DragSlot.instance.dragSlot.SetSlotCount(-1);            // 슬롯아이템 개수 차감
             yield return new WaitForSeconds(0.05f);
         }
+
+        if (int.Parse(text_Preview.text) == _num)           // 텍스트 형태 int형태로 바꾼후 버리는 아이템의 갯수와 같다면
+            if (QuickSlotController.go_HandItem != null)    // 손에 들고 있는 아이템이 있다면
+                Destroy(QuickSlotController.go_HandItem);   // 손에 들고 있는 아이템 제거
 
         DragSlot.instance.dragSlot = null;      // 슬롯 초기화
         go_Base.SetActive(false);               // 아이템 버리는 갯수 창(인풋필드)비활성화

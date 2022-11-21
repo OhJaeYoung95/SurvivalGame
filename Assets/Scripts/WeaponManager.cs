@@ -99,6 +99,8 @@ public class WeaponManager : MonoBehaviour
                 break;
             case "HAND":
                 HandController.isActivate = false;      // 비활성화
+                if (QuickSlotController.go_HandItem != null)        // 손으로 교체시 아이템이 있다면
+                    Destroy(QuickSlotController.go_HandItem);       // 아이템 제거
                 break;
             case "AXE":
                 AxeController.isActivate = false;      // 비활성화

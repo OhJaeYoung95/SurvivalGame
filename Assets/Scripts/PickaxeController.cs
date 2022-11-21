@@ -26,15 +26,16 @@ public class PickaxeController : CloseWeaponController
         {
             if (CheckObject())
             {
-                if (hitInfo.transform.tag == "Rock")
+                if (hitInfo.transform.tag == "Rock")                                          // 바위일시
+                    hitInfo.transform.GetComponent<Rock>().Mining();                          // 채광
+                else if (hitInfo.transform.tag == "Twig")                                     // 나뭇가지일시
+                    hitInfo.transform.GetComponent<Twig>().Damage(this.transform);            // 대미지
+                else if (hitInfo.transform.tag == "NPC")                                      // NPC일시
                 {
-                    hitInfo.transform.GetComponent<Rock>().Mining();
-                }                
-                else if (hitInfo.transform.tag == "Twig")
-                {
-                    hitInfo.transform.GetComponent<Twig>().Damage(this.transform);
+                    SoundManager.instance.PlaySE("Animal_Hit");     // 동물 타격 효과음 재생
+                    hitInfo.transform.GetComponent<Pig>().Damage(1, transform.position);      // 대미지
                 }
-                isSwing = false;
+                isSwing = false;        // 프레임 마다 호출하기에 false 값을 넣어 위 코드를 한번만 실행하도록 설정
                 Debug.Log(hitInfo.transform.name);
             }
             yield return null;

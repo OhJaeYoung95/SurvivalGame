@@ -22,17 +22,28 @@ public class ItemEffectDatabase : MonoBehaviour
     private WeaponManager theWeaponManager;         // 총 장착을 위한 변수
     [SerializeField]
     private SlotToolTip theSlotToolTip;             // 아이템 툴팁 창을 다루기 위한 변수
+    [SerializeField]
+    private QuickSlotController theQuickSlotController;     //
 
     // 문자를 상수화 시켜 switch case 문에 보다 쉽게 입력
     private const string HP = "HP", SP = "SP", DP = "DP", HUNGRY = "HUNGRY", THIRSTY = "THIRSTY", SATISFY = "SATISFY";
 
+    // QuickSlotController 징검다리 역할
+    public void IsActivatedQuickSlot(int _num)
+    {
+        theQuickSlotController.IsActivatedQuickSlot(_num);
+    }
+
+
     //슬롯은 프리팹이라 외부 자원을 가져올때 메모리 낭비가 심해서
     //이렇게 이중호출을 해서 메모리 낭비를 줄인다
+    // SlotTooltip 징검다리 역할 함수
     public void ShowToolTip(Item _item, Vector3 _pos)     // 툴팁 활성화
     {
         theSlotToolTip.ShowToolTip(_item, _pos);
     }
 
+    // SlotTooltip 징검다리 역할 함수
     public void HideToolTip()               // 툴팁 비활성화
     {
         theSlotToolTip.HideToolTip();

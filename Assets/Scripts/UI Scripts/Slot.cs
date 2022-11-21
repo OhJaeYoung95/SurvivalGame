@@ -9,7 +9,12 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
     public Item item;           // 획득한 아이템의 정보를 가져오기 위한 Item 변수
     public int itemCount;       // 획득한 아이템 수량
     public Image itemImage;     // 아이템의 이미지
-    
+
+    [SerializeField]
+    private bool isQuickSlot;       // 퀵슬롯 판단 여부
+    [SerializeField]
+    private int quickSlotNumber;    // 퀵슬롯 번호
+
     // 필요한 컴포넌트
     [SerializeField]
     private Text text_Count;                    // 아이템 수량 나타내주는 텍스트
@@ -60,6 +65,11 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
         SetColor(1);            // 아이템 슬롯 활성화
     }
 
+    public int GetQuickSlotNumber()         // 외부에서 퀵슬롯 넘버를 얻기 위한 함수
+    {
+        return quickSlotNumber;
+    }
+
     public void SetSlotCount(int _count)        // 슬롯아이템 개수 설정
     {
         itemCount += _count;
@@ -86,7 +96,8 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
         {
             if(item != null)            // 아이템이 있다면
             {
-                    theItemEffectDatabase.UseItem(item);        // 아이템 사용 효과
+                theItemEffectDatabase.UseItem(item);        // 아이템 사용 효과
+
                 if(item.itemType == Item.ItemType.Used)         // 아이템 타입이 소모품이라면
                     SetSlotCount(-1);       // 아이템 수량 1 소모
             }
@@ -95,7 +106,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
 
     public void OnBeginDrag(PointerEventData eventData)         // 드래그 시작
     {
-        if(item != null)
+        if(item != null && Inventory.inventoryActivated)        // 아이템이 있고 인벤토리가 활성화 되어있을때만 드래그 가능
         {
             DragSlot.instance.dragSlot = this;               // DragSlot instance에 자기 자신을 대입
             DragSlot.instance.DragSetImage(itemImage);          // 드래그 하는 이미지 활성화
@@ -115,12 +126,15 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
     public void OnEndDrag(PointerEventData eventData)           // 드래그가 끝나기만 하면 호출됨
     {
         // !(인벤토리 영역 || // 퀵슬롯 영역), 인벤토리와 퀵슬롯 영역이 아니라면
-        if (!(((DragSlot.instance.transform.localPosition.x > baseRect.rect.xMin && DragSlot.instance.dragSlot.transform.localPosition.x < baseRect.rect.xMax
-            && DragSlot.instance.transform.localPosition.y > baseRect.rect.yMin && DragSlot.instance.dragSlot.transform.localPosition.y < baseRect.rect.yMax))
+        if (!((DragSlot.instance.transform.localPosition.x > baseRect.rect.xMin 
+            && DragSlot.instance.transform.localPosition.x < baseRect.rect.xMax
+            && DragSlot.instance.transform.localPosition.y > baseRect.rect.yMin 
+            && DragSlot.instance.transform.localPosition.y < baseRect.rect.yMax)
             ||   
-            (DragSlot.instance.transform.localPosition.x > quickSlotBaseRect.rect.xMin && DragSlot.instance.dragSlot.transform.localPosition.x < quickSlotBaseRect.rect.xMax
-            && DragSlot.instance.transform.localPosition.y < quickSlotBaseRect.transform.localPosition.y -quickSlotBaseRect.rect.yMin 
-            && DragSlot.instance.dragSlot.transform.localPosition.y > quickSlotBaseRect.transform.localPosition.y - quickSlotBaseRect.rect.yMax)))
+            (DragSlot.instance.transform.localPosition.x > quickSlotBaseRect.rect.xMin 
+            && DragSlot.instance.transform.localPosition.x < quickSlotBaseRect.rect.xMax
+            && DragSlot.instance.transform.localPosition.y + baseRect.transform.localPosition.y < quickSlotBaseRect.transform.localPosition.y - quickSlotBaseRect.rect.yMin 
+            && DragSlot.instance.transform.localPosition.y + baseRect.transform.localPosition.y > quickSlotBaseRect.transform.localPosition.y - quickSlotBaseRect.rect.yMax)))  //+ baseRect.transform.localPosition.y 를 해준 이유 좌표값이 0,0,0이 아니라 y값이 130 값이 주어져서
         {
             if(DragSlot.instance.dragSlot != null)      // 드래그한 슬롯이 빈칸이 아니라면
             {
@@ -137,7 +151,17 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPo
     public void OnDrop(PointerEventData eventData)              // 다른 슬롯위에서 드래그가 끝났을때만 호출
     {
         if(DragSlot.instance.dragSlot != null)          // 드래그 슬롯에 아이템이 있을때
+        {
             ChangeSlot();                               // 슬롯 변경         
+
+            if (isQuickSlot)     // 인벤토리 => 퀵슬롯 || 퀵슬롯 => 퀵슬롯
+                theItemEffectDatabase.IsActivatedQuickSlot(quickSlotNumber);       // 활성화된 퀵슬롯 ? 교체 작업
+            else                 // 인벤토리 => 인벤토리, 퀵슬롯 => 인벤토리
+            {
+                if (DragSlot.instance.dragSlot.isQuickSlot)     // 퀵슬롯 => 인벤토리
+                    theItemEffectDatabase.IsActivatedQuickSlot(DragSlot.instance.dragSlot.quickSlotNumber);       // 활성화된 퀵슬롯? 교체 작업
+            }
+        }
     }
 
     private void ChangeSlot()               // 슬롯 변경
