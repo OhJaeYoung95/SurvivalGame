@@ -18,6 +18,8 @@ public abstract class CloseWeaponController : MonoBehaviour
     protected bool isSwing = false;   // 팔을 휘두르는 중인지 체크하는 변수
 
     protected RaycastHit hitInfo;     // 광선을 쏘았을때 닿은 녀석의 정보를 얻어올 수 있는 변수
+    [SerializeField]
+    protected LayerMask layerMask;      // 영향 받지 않는 레이어를 선택하기 위한 변수
 
     // 필요한 컴포넌트
     private PlayerController thePlayerController;       // 카메라 로테이션 값 설정을 위한 컴포넌트
@@ -77,7 +79,7 @@ public abstract class CloseWeaponController : MonoBehaviour
     protected bool CheckObject()  // 공격이 닿았는지 확인해주는 Bool형 함수
     {
         // 캐릭터에서 광선을 쏘아 범위안에 물체가 있다면 닿은 물체의 정보를 불러오게 해준다.
-        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, currentCloseWeapon.range))
+        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, currentCloseWeapon.range, layerMask))
         {
             return true; // 물체가 닿으면 True를 반환한다.
         }

@@ -30,10 +30,10 @@ public class PickaxeController : CloseWeaponController
                     hitInfo.transform.GetComponent<Rock>().Mining();                          // 채광
                 else if (hitInfo.transform.tag == "Twig")                                     // 나뭇가지일시
                     hitInfo.transform.GetComponent<Twig>().Damage(this.transform);            // 대미지
-                else if (hitInfo.transform.tag == "NPC")                                      // NPC일시
+                else if (hitInfo.transform.tag == "WeakAnimal")                                      // NPC일시
                 {
                     SoundManager.instance.PlaySE("Animal_Hit");     // 동물 타격 효과음 재생
-                    hitInfo.transform.GetComponent<Pig>().Damage(1, transform.position);      // 대미지
+                    hitInfo.transform.GetComponent<WeakAnimal>().Damage(1, transform.position);      // 대미지
                 }
                 isSwing = false;        // 프레임 마다 호출하기에 false 값을 넣어 위 코드를 한번만 실행하도록 설정
                 Debug.Log(hitInfo.transform.name);

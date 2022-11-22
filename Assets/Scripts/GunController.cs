@@ -22,6 +22,8 @@ public class GunController : MonoBehaviour
     private AudioSource audioSource;    // 오디오 소스 (음향효과음)
 
     private RaycastHit hitInfo;         // 레이저에 충돌한 객체의 정보를 가져오는 변수
+    [SerializeField]
+    private LayerMask layerMask;        // 영향 받지 않는 레이어를 선택하기 위한 변수
 
     // 필요한 컴포넌트
     [SerializeField]
@@ -100,7 +102,7 @@ public class GunController : MonoBehaviour
         if(Physics.Raycast(theCam.transform.position, theCam.transform.forward + 
             new Vector3(Random.Range(-theCrosshair.GetAccuracy() - currentGun.accuracy, theCrosshair.GetAccuracy() + currentGun.accuracy),
                         Random.Range(-theCrosshair.GetAccuracy() - currentGun.accuracy, theCrosshair.GetAccuracy() + currentGun.accuracy),
-                        0), out hitInfo, currentGun.range)) // 화면 카메라 기준 중앙에서 레이저를 총의 사정거리만큼 앞으로 쏘아서 정보를 가져온다.// 랜덤값을 통해 정확도를 계산해준다.
+                        0), out hitInfo, currentGun.range, layerMask)) // 화면 카메라 기준 중앙에서 레이저를 총의 사정거리만큼 앞으로 쏘아서 정보를 가져온다.// 랜덤값을 통해 정확도를 계산해준다.
         {
             GameObject clone = Instantiate(hit_effect_prefab,hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
             Destroy(clone, 2f);
