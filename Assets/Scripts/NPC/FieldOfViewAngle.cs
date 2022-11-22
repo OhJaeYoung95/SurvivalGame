@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class FieldOfViewAngle : MonoBehaviour
 {
@@ -11,36 +12,24 @@ public class FieldOfViewAngle : MonoBehaviour
     [SerializeField]
     private LayerMask targetMask;    // 타겟 마스크 (플레이어)
 
-    // 필요한 컴포넌트
-    private Pig thePig;         // 돼지 행동 제어를 위한 변수
+    private PlayerController thePlayer;
+    private NavMeshAgent nav;
 
     void Start()
     {
-        thePig = GetComponent<Pig>();
+        thePlayer = FindObjectOfType<PlayerController>();
+        nav = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public Vector3 GetTargetPos()       // 플레이어 Vector값 반환
     {
-        View();
+        return thePlayer.transform.position;
     }
 
-    private Vector3 BoundaryAngle(float _angle)     // 시야 구하는 공식
+
+
+    public bool View()         // 시야(사거리)안에 플레이어가 들어왔는지 체크하는 Bool형 함수
     {
-        _angle += transform.eulerAngles.y;
-        return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad), 0f, Mathf.Cos(_angle * Mathf.Deg2Rad));
-    }
-
-    private void View()         // 시야
-    {
-        Vector3 _leftBoundary = BoundaryAngle(-viewAngle * 0.5f);           // 왼쪽시야
-        Vector3 _rightBoundary = BoundaryAngle(viewAngle * 0.5f);           // 오른쪽시야
-
-        // 디버깅 용으로 레이저를 쏘는 기능, 게임상x 씬상 o
-        // DrawRay(레이저가 나갈 위치, 레이저가 나아갈 방향, 레이저색상)
-        Debug.DrawRay(transform.position + transform.up, _leftBoundary, Color.red);
-        Debug.DrawRay(transform.position + transform.up, _rightBoundary, Color.red);
-
         // Physics.OverlapSphere() 일정 반경안에 있는 콜라이더들을 전부 뽑아내서 저장시키는 명령어
         // Physics.OverlapSphere(반경이 생성될 위치, 반경의 지름(반경이 퍼질 거리), 해당되는 콜라이더 조건(레이어마스크))
         Collider[] _target = Physics.OverlapSphere(transform.position, viewDistance, targetMask);
@@ -49,7 +38,7 @@ public class FieldOfViewAngle : MonoBehaviour
         {
             // 타겟의 정보를 가져온다
             Transform _targetTf = _target[i].transform;
-            if(_targetTf.name == "Player")
+            if(_targetTf.name == "Player")          // 반경안에 플레이어가 있을때
             {
                 Vector3 _direction = (_targetTf.position - transform.position).normalized;  // 타겟에서 돼지쪽으로의 방향,방향으로 정규화
                 // Vector3.Angle(a,b) a와 b 사이의 각도를 구해준다
@@ -65,12 +54,40 @@ public class FieldOfViewAngle : MonoBehaviour
                         {
                             Debug.Log("플레이어가 돼지 시야 내에 있습니다");
                             Debug.DrawRay(transform.position + transform.up, _direction, Color.blue);
-                            thePig.Run(_hit.transform.position);
+                            return true;        // 감지
                         }
                     }
                 }
-
+            }
+            if(thePlayer.GetRun())      // 플레이어가 뛸 경우
+            {
+                if(CalcPathLength(thePlayer.transform.position) <= viewDistance)        // 플레이어와의 경로(거리)가 동물의 시야사거리보다 작을경우
+                {
+                    Debug.Log("돼지가 주변에서 뛰고 있는 플레이어의 움직임을 감지");
+                    return true;        // 감지
+                }
             }
         }
+        return false;               // 감지 못함
+    }
+
+    private float CalcPathLength(Vector3 _targetPos)        // 장애물포함 경로 계산 함수
+    {
+        NavMeshPath _path = new NavMeshPath();      // 네비게이션 시스템에 의해서 계산된 경로
+        nav.CalculatePath(_targetPos, _path);       // 타겟까지 가는 길을 계산해서 대입해준다
+
+        Vector3[] _wayPoint = new Vector3[_path.corners.Length + 2];    // 코너값2개와 자기자신과 타겟의 위치를 포함
+
+        _wayPoint[0] = transform.position;                      // 자기자신의 위치
+        _wayPoint[_path.corners.Length + 1] = _targetPos;       // 타겟의 위치(배열의 마지막위치)
+
+        float _pathLength = 0;
+        for (int i = 0; i < _path.corners.Length; i++)
+        {
+            _wayPoint[i+1] =_path.corners[i];       // 웨이포인트에 경로를 넣음
+            _pathLength += Vector3.Distance(_wayPoint[i], _wayPoint[i + 1]);    // 경로 계산
+        }
+
+        return _pathLength;
     }
 }

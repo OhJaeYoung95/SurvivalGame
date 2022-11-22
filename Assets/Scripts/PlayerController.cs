@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    static public bool isActivated = true;      // 플레이어 조종할수 있는지
+
     // 스피드 조절 변수
     [SerializeField]
     private float walkSpeed;            // 걷는 속도 변수
@@ -81,16 +83,19 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        IsGround();
-        TryJump();
-        TryRun();
-        TryCrouch();
-        Move();
-        MoveCheck();
-        if(!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
+        if(isActivated)         // 활성화중에만 실행되도록
         {
-            CameraRotation();
-            CharacterRotation();
+            IsGround();
+            TryJump();
+            TryRun();
+            TryCrouch();
+            Move();
+            MoveCheck();
+            if (!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
+            {
+                CameraRotation();
+                CharacterRotation();
+            }
         }
     }
 
@@ -234,6 +239,12 @@ public class PlayerController : MonoBehaviour
             lastPos = transform.position;               // 현재 프레임의 포지션을 lastPos변수에 대입
         }
     }
+    private void CharacterRotation() // 캐릭터 좌우 회전 함수
+    {
+        float _yRotation = Input.GetAxisRaw("Mouse X");             // 마우스 좌우 움직에 따라서 Y축 회전 값 입력
+        Vector3 _characterRotationY = new Vector3(0f, _yRotation, 0f) * lookSensitivity;  // 캐릭처 Y축에 회전값 설정
+        myRigid.MoveRotation(myRigid.rotation * Quaternion.Euler(_characterRotationY));   // 캐릭터의 Y 축 회전값만큼 회전시킨다.
+    }
 
     private void CameraRotation() // 카메라 상하 회전 함수
     {
@@ -271,10 +282,20 @@ public class PlayerController : MonoBehaviour
         pauseCameraRotation = false;                 // 카메라 회전 가능
     }
 
-    private void CharacterRotation() // 캐릭터 좌우 회전 함수
+    public bool GetRun()
     {
-        float _yRotation = Input.GetAxisRaw("Mouse X");             // 마우스 좌우 움직에 따라서 Y축 회전 값 입력
-        Vector3 _characterRotationY = new Vector3(0f, _yRotation, 0f) * lookSensitivity;  // 캐릭처 Y축에 회전값 설정
-        myRigid.MoveRotation(myRigid.rotation * Quaternion.Euler(_characterRotationY));   // 캐릭터의 Y 축 회전값만큼 회전시킨다.
+        return isRun;
+    }
+    public bool GetWalk ()
+    {
+        return isWalk;
+    }
+    public bool GetCrouch()
+    {
+        return isCrouch;
+    }
+    public bool GetIsGround()
+    {
+        return isGround;
     }
 }

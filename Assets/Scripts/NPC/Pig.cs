@@ -5,6 +5,16 @@ using UnityEngine;
 public class Pig : WeakAnimal
 {
     // 부모클래스 함수를 수정해서 사용할때 override 해서 사용
+    protected override void Update()
+    {
+        base.Update();
+        if(theViewAngle.View() && !isDead)      // 시야안에 있고 죽지않았으면
+        {
+            Run(theViewAngle.GetTargetPos());   // 플레이어로부터 도망간다
+        }
+    }
+
+    // 부모클래스 함수를 수정해서 사용할때 override 해서 사용
     protected override void ReSet()
     {
         base.ReSet();

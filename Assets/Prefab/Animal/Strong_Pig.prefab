@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8389385941408928953}
   - component: {fileID: 8389385941408928952}
   - component: {fileID: 8389385941408928948}
-  - component: {fileID: 8389385941408928950}
+  - component: {fileID: 3914879006371278389}
   - component: {fileID: 8389385941408928951}
   - component: {fileID: 8389385941408928949}
   m_Layer: 0
@@ -49,7 +49,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
@@ -83,7 +83,7 @@ MonoBehaviour:
   targetMask:
     serializedVersion: 2
     m_Bits: 128
---- !u!114 &8389385941408928950
+--- !u!114 &3914879006371278389
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,16 +92,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 8389385941408928954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fa89f1c7b4a2c943b61bb6229ffbc21, type: 3}
+  m_Script: {fileID: 11500000, guid: 18bf0ec9005969648876e46f7e5652c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalName: Pig
+  animalName: PigWild
   hp: 2
+  item_Prefab: {fileID: 0}
+  itemNumber: 0
   walkSpeed: 1
-  runSpeed: 10
+  runSpeed: 4
+  isDead: 0
   walkTime: 5
   waitTime: 4
-  runTime: 3
+  runTime: 5
   anim: {fileID: 8389385941977524272}
   rigid: {fileID: 8389385941408928953}
   boxCol: {fileID: 8389385941408928952}
@@ -111,6 +114,13 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8f8582b9e1419c9489c2f055e0b7b9d6, type: 3}
   sound_Hurt: {fileID: 8300000, guid: 2576a8e1fd281864ba888a6c4e83b676, type: 3}
   sound_Dead: {fileID: 8300000, guid: 65140d1bef2dca24790253f9884c3a52, type: 3}
+  attackDamage: 0
+  attackDelay: 0
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+  ChaseTime: 4
+  ChaseDelayTime: 0.5
 --- !u!82 &8389385941408928951
 AudioSource:
   m_ObjectHideFlags: 0

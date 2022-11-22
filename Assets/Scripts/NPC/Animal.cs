@@ -5,10 +5,20 @@ using UnityEngine.AI;
 
 public class Animal : MonoBehaviour
 {
+    protected StatusController thePlayerStatus;     // 플레이어 스테이터스 정보
+
+
+
     [SerializeField]
-    protected string animalName;          // 동물 이름
+    public string animalName;          // 동물 이름
     [SerializeField]
     protected int hp;                     // 동물 체력
+
+    [SerializeField]
+    protected Item item_Prefab;           // 동물 아이템
+    [SerializeField]
+    public int itemNumber;            // 동물 아이템 획득 수량
+
 
     [SerializeField]
     protected float walkSpeed;            // 걷기 스피드
@@ -22,7 +32,8 @@ public class Animal : MonoBehaviour
     protected bool isWalking;             // 걷는지 안걷는지
     protected bool isRunning;             // 뛰는지
     protected bool isChasing;             // 추격중인지
-    protected bool isDead;                // 죽었는지
+    protected bool isAttacking;           // 공격중인지
+    public bool isDead;                // 죽었는지
 
     [SerializeField]
     protected float walkTime;             // 걷기 시간
@@ -41,6 +52,7 @@ public class Animal : MonoBehaviour
     protected BoxCollider boxCol;
     protected AudioSource theAudio;
     protected NavMeshAgent nav;
+    protected FieldOfViewAngle theViewAngle;
 
     [SerializeField]
     protected AudioClip[] sound_Normal;   // 평소 사운드
@@ -54,6 +66,8 @@ public class Animal : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        thePlayerStatus = FindObjectOfType<StatusController>();
+        theViewAngle = GetComponent<FieldOfViewAngle>();
         nav = GetComponent<NavMeshAgent>();
         theAudio = GetComponent<AudioSource>();
         currentTime = waitTime;
@@ -61,7 +75,7 @@ public class Animal : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (!isDead)             // 동물이 죽지 않았으면
         {
@@ -87,7 +101,7 @@ public class Animal : MonoBehaviour
         if (isAction)            // 행동중일때만
         {
             currentTime -= Time.deltaTime;          // 1초에 1씩 감소
-            if (currentTime <= 0 && !isChasing)        // 현재 행동시간이 끝나면, 추격중이 아니면     
+            if (currentTime <= 0 && !isChasing && !isAttacking)        // 현재 행동시간이 끝나면, 추격중이 아니면, 공격중이 아니면 
                 ReSet();        // 조건 리셋후 다음 랜덤 행동
         }
     }
@@ -138,7 +152,10 @@ public class Animal : MonoBehaviour
         // 죽었을때의 상태 (움직임X, 사망애니메이션)
         isWalking = false;
         isRunning = false;
+        isChasing = false;
+        isAttacking = false;
         isDead = true;
+        nav.ResetPath();        // 움직임 정지, 초기화
         anim.SetTrigger("Dead");
     }
 
@@ -152,5 +169,12 @@ public class Animal : MonoBehaviour
     {
         theAudio.clip = _clip;                  // 해당 클립 대입
         theAudio.Play();                        // 해당 클립 재생
+    }
+
+    public Item GetItem()                   // 아이템 획득 함수
+    {
+        this.gameObject.tag = "Untagged";
+        Destroy(this.gameObject, 3f);
+        return item_Prefab;
     }
 }
