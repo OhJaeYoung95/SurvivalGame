@@ -11,6 +11,8 @@ TagManager:
   - Item
   - WeakAnimal
   - StrongAnimal
+  - Fire
+  - Structure
   layers:
   - Default
   - TransparentFX
@@ -20,10 +22,10 @@ TagManager:
   - UI
   - Weapon
   - Player
-  - 
-  - 
-  - 
-  - 
+  - NPC
+  - Fire
+  - Terrain
+  - Building
   - 
   - 
   - 

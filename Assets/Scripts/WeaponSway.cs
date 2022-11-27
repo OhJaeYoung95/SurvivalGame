@@ -28,6 +28,7 @@ public class WeaponSway : MonoBehaviour
     // 필요한 컴포넌트
     [SerializeField]
     private GunController theGunController;     // 정조준 상태의 값을 받아오기 위한 GunController
+
     // Start is called before the first frame update
     void Start()
     {

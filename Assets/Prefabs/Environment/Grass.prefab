@@ -571,6 +571,7 @@ GameObject:
   - component: {fileID: 166538719617809098}
   - component: {fileID: 166538719832809342}
   - component: {fileID: 166538719832809343}
+  - component: {fileID: -1263700956629515962}
   m_Layer: 0
   m_Name: Grass
   m_TagString: Grass
@@ -638,6 +639,22 @@ MonoBehaviour:
   item_leaf: {fileID: 11400000, guid: 142c5829b846b6b4689c5bb3bffe5898, type: 2}
   lleafCount: 3
   hit_sound: Twig_Hit
+--- !u!54 &-1263700956629515962
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 166538719617967850}
+  serializedVersion: 2
+  m_Mass: 0.0000001
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &166538719617967852
 GameObject:
   m_ObjectHideFlags: 0

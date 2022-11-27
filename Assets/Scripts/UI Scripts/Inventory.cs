@@ -13,11 +13,13 @@ public class Inventory : MonoBehaviour
     private GameObject go_SlotsParent;              //  슬롯 그리드 세팅
     [SerializeField]
     private GameObject go_QuickSlotParent;          // 퀵슬롯 부모
+    [SerializeField]
+    private QuickSlotController theQuickSlot;       // 퀵슬롯 정보
 
     private Slot[] slots;                           // 인벤토리 슬롯 배열
     private Slot[] quickslots;                      // 퀵 슬롯 배열
     private bool isNotPut;                          // 인벤토리든 퀵슬롯이든 꽉 찼을경우
-
+    private int slotNumber;                         // 슬롯넘버
 
     // Start is called before the first frame update
     void Start()
@@ -64,10 +66,11 @@ public class Inventory : MonoBehaviour
     {
             // 첫번째 인자에 quickslots(퀵슬롯), slots(인벤토리)에 넣을건지 정한다
             PutSlot(quickslots, _item, _count);
+        if (!isNotPut)      // 퀵슬롯이 꽉 안찼을경우
+            theQuickSlot.IsActivatedQuickSlot(slotNumber);      // 퀵슬롯에 대해서 실행해주는 함수 실행
+
             if (isNotPut)   // 인벤토리든 퀵슬롯이든 꽉 찼을경우 
-            {
                 PutSlot(slots, _item, _count);
-            }
             if (isNotPut)       // 인벤토리 퀵슬롯 둘다 꽉 찼을경우
                 Debug.Log("퀵슬롯과 인벤토리가 꽉찼습니다");
     }
@@ -81,6 +84,7 @@ public class Inventory : MonoBehaviour
                 {
                     if (_slots[i].item.itemName == _item.itemName)        // 슬롯의 아이템과 얻은 아이템의 이름이 같다면
                     {
+                        slotNumber = i;
                         _slots[i].SetSlotCount(_count);      // 아이템 개수 설정
                         isNotPut = false;           // 인벤토리든 퀵슬롯이든 덜 찼을경우
                         return;
@@ -98,5 +102,58 @@ public class Inventory : MonoBehaviour
             }
         }
         isNotPut = true;            // 인벤토리든 퀵슬롯이든 꽉 찼을경우
+    }
+
+     // 인벤토리 퀵슬롯 둘다 확인해서 아이템 개수 반환해주는 함수
+    public int GetItemCount(string _itemName)      
+    {
+        // 임시 변수에 인벤토리에서 가져온 아이템 개수를 대입
+        int temp = SearchSlotItem(slots, _itemName);
+
+        // 인벤토리 슬롯의 아이템이 없다면 퀵슬롯에서 찾게 해준다
+        return temp != 0 ? temp : SearchSlotItem(quickslots, _itemName);
+    }
+
+    // 인벤토리 or 퀵슬롯에서 슬롯에 있는 아이템의 개수를 반환해 주는 함수
+    private int SearchSlotItem(Slot[]_slots, string _itemName)
+    {
+        // (인벤토리 or 퀵슬롯)슬롯 길이만큼 반복
+        for(int i =0; i < _slots.Length; i++)
+        {
+            if(_slots[i].item != null)      // 슬롯의 아이템이 있을경우
+            {
+                // 슬롯의 아이템 이름과 같다면
+                if (_itemName == _slots[i].item.itemName)
+                    return _slots[i].itemCount;     // 슬롯의 아이템 개수 반환
+            }
+        }
+        return 0;       // 없으면 0반환
+    }
+
+    public void SetItemCount(string _itemName, int _itemCount)
+    {
+        // 인벤토리 아이템 개수 조정
+        if (!ItemCountAdjust(slots, _itemName, _itemCount))
+            ItemCountAdjust(quickslots, _itemName, _itemCount); // 퀵슬롯 아이템 개수 조정
+    }
+
+    // 아이템 개수 조정 Bool형 함수
+    private bool ItemCountAdjust(Slot[] _slots, string _itemName, int _itemCount)
+    {
+        // (인벤토리 or 퀵슬롯)슬롯 길이만큼 반복
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (_slots[i].item != null)      // 슬롯의 아이템이 있을경우
+            {
+                // 아이템이름이 슬롯 아이템이름과 동일하다면
+                if (_itemName == _slots[i].item.itemName)
+                {
+                    // 슬롯 아이템 개수 설정
+                    _slots[i].SetSlotCount(-_itemCount);
+                    return true;    // Bool형이라 true 반환
+                }
+            }
+        }
+        return false;
     }
 }

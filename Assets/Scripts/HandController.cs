@@ -27,7 +27,7 @@ public class HandController : CloseWeaponController
         if(Input.GetButtonDown("Fire1") && !theQuickSlot.GetIsCoolTime())        // 마우스 좌클릭시
         {
             currentCloseWeapon.anim.SetTrigger("Eat");      // 아이템 먹는 애니메이션 실행
-            theQuickSlot.EatItem();             // 아이템 먹기
+            theQuickSlot.DecreaseSelectedItem();             // 선택된 퀵슬롯 아이템 소모 함수
         }
     }
 

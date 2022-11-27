@@ -198,7 +198,7 @@ public class QuickSlotController : MonoBehaviour
         go_HandItem.transform.SetParent(tf_ItemPos);        // 손에든 아이템을 아이템 생성위치 오브젝트를 부모로 설정
     }
 
-    public void EatItem()           // 아이템 먹는 함수
+    public void DecreaseSelectedItem()           // 선택된 퀵슬롯 아이템 소모 함수
     {
         CoolTimeReset();                // 쿨타임 초기화
         AppearReset();                  // 퀵슬롯 등장
@@ -211,5 +211,10 @@ public class QuickSlotController : MonoBehaviour
     public bool GetIsCoolTime()         // 외부에서 쿨타임여부를 확인하기 위한 변수
     {
         return isCoolTime;
+    }
+
+    public Slot GetSelectedSlot()       // 선택된 퀵슬롯을 외부로 넘기는 함수
+    {
+        return quickSlots[selectedSlot];
     }
 }
