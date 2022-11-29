@@ -130,7 +130,7 @@ public class Inventory : MonoBehaviour
         return 0;       // 없으면 0반환
     }
 
-    public void SetItemCount(string _itemName, int _itemCount)
+    public void SetItemCount(string _itemName, int _itemCount)      // 아이템 개수 조정
     {
         // 인벤토리 아이템 개수 조정
         if (!ItemCountAdjust(slots, _itemName, _itemCount))
