@@ -165,6 +165,11 @@ public class CraftManual : MonoBehaviour
         // 건축 메뉴얼에서 클릭한 슬롯에 대한 실제 프리팹에 대한 정보를 대입
         go_Prefab = craft_SelectedTab[selectedSlotNumber].go_Prefab;
         isPreviewActivated = true;          // 미리보기 활성화
+
+        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;     // 마우스 커서 비활성화
+
         go_BaseUI.SetActive(false);         // 기본 베이스 UI 비활성화
     }
 
@@ -258,6 +263,9 @@ public class CraftManual : MonoBehaviour
         isPreviewActivated = false;
         go_Preview = null;
         go_Prefab = null;
+        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;     // 마우스 커서 비활성화
         go_BaseUI.SetActive(false);
 
     }
@@ -272,12 +280,18 @@ public class CraftManual : MonoBehaviour
 
     private void OpenWindow()                    // 창을 여는 함수
     {
+        // 커서 상태, 원래 상태로
+        Cursor.lockState = CursorLockMode.None;     // 평소 상태
+        Cursor.visible = true;          // 마우스 커서 활성화
         isActiavted = true;                      // 상태변수 활성화
         go_BaseUI.SetActive(true);               // 오브젝트 활성화
     }
 
     private void CloseWindow()                  // 창을 닫는 함수
     {
+        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;     // 마우스 커서 비활성화
         isActiavted = false;                    // 상태변수 비활성화
         go_BaseUI.SetActive(false);             // 오브젝트 비활성화
     }

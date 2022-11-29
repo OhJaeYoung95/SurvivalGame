@@ -54,11 +54,17 @@ public class Inventory : MonoBehaviour
 
     private void OpenInventory()        // 인벤토리 활성화
     {
+        // 커서 상태, 원래 상태로
+        Cursor.lockState = CursorLockMode.None;     // 평소 상태
+        Cursor.visible = true;          // 마우스 커서 활성화
         go_InventoryBase.SetActive(true);
     }
 
     private void CloseInventory()       // 인벤토리 비활성화
     {
+        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;     // 마우스 커서 비활성화
         go_InventoryBase.SetActive(false);
     }
 

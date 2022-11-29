@@ -20,11 +20,16 @@ public class ComputerKit : MonoBehaviour
 
     [SerializeField]
     private Transform tf_ItemAppear;     // 생성될 아이템 위치
+    [SerializeField]
+    private GameObject go_BaseUI;       // 컴퓨터 키트 UI
 
     private bool isCraft = false;           // 키트 생성중인지 여부, 중복 실행 방지
-    
+    public bool isPowerOn = false;          // 전원 여부
+
     // 필요한 컴포넌트
-    private Inventory theInven;
+    private Inventory theInven;             // 인벤 아이템 개수 조정을 위한 컴포넌트
+    [SerializeField]
+    private ComputerTooltip theToolTip;     // 툴팁UI 활성화, 비활성화를 위한 컴포넌트
 
     private AudioSource theAudio;
     [SerializeField]
@@ -36,10 +41,50 @@ public class ComputerKit : MonoBehaviour
     [SerializeField]
     private AudioClip sound_Output;             // 아이템 드랍 소리
 
+    public void ShowToolTip(int _buttonNum)     // 툴팁 활성화, 보여주는 함수
+    {
+        theToolTip.ShowToolTip(kits[_buttonNum].KitName, kits[_buttonNum].kitDescription, kits[_buttonNum].needItemName, kits[_buttonNum].needItemNumber);
+    }
+
+    public void HideToolTip()           // 툴팁 비활성화, 숨기는 함수
+    {
+        theToolTip.HideToolTip();
+    }
+
     void Start()
     {
+        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;     // 마우스 커서 비활성화
+
         theInven = FindObjectOfType<Inventory>();
         theAudio = GetComponent<AudioSource>();
+    }
+
+    void Update()
+    {
+        if (isPowerOn)       // 컴퓨터 전원이 On일때
+            if (Input.GetKeyDown(KeyCode.Escape))
+                PowerOff();
+    }
+
+    public void PowerOn()       // 컴퓨터 전원 On
+    {
+        // 커서 상태, 원래 상태로
+        Cursor.lockState = CursorLockMode.None;     // 평소 상태
+        Cursor.visible = true;          // 마우스 커서 활성화
+        isPowerOn = true;               // 전원 On 상태
+        go_BaseUI.SetActive(true);
+    }
+
+    private void PowerOff()      // 컴퓨터 전원 Off
+    {
+        // 커서 상태, 커서가 사라지면서 가운데 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;         // 마우스 커서 비활성화
+        isPowerOn = false;              // 전원 Off 상태
+        theToolTip.HideToolTip();       // 툴팁 비활성화
+        go_BaseUI.SetActive(false);
     }
 
     private void PlaySE(AudioClip _clip)    // 효과음 재생 사운드

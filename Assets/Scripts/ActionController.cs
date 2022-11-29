@@ -16,6 +16,8 @@ public class ActionController : MonoBehaviour
 
     private bool fireLookActivated = false;     // 불을 근접해서 바라볼시 true
 
+    private bool lookComputer = false;          // 컴퓨터를 바라볼 시 true
+
     private RaycastHit hitInfo;         // 충돌체 정보 저장
 
     [SerializeField]
@@ -32,6 +34,8 @@ public class ActionController : MonoBehaviour
     private QuickSlotController theQuickSlot;   // 퀵슬롯 정보를 다루기 위한 변수
     [SerializeField]
     private Transform tf_MeatDissolveTool;      // 고기 해체 툴
+    [SerializeField]
+    private ComputerKit theComputer;            // 컴퓨터 전원 On/Off를 위한 컴포넌트
 
     [SerializeField]
     private string sound_meat;              // 고기 해체 효과음 재생
@@ -52,6 +56,7 @@ public class ActionController : MonoBehaviour
             CanPickUp();                    // 아이템 습득 함수
             CanMeat();                      // 고기 해체 함수
             CanDropFire();                  // 불에 고기 떨구는 함수
+            CanComputerPowerOn();           // 컴퓨터 전원 On 해주는 함수
         }
     }
 
@@ -65,6 +70,21 @@ public class ActionController : MonoBehaviour
                 theInventory.AcquireItem(hitInfo.transform.GetComponent<ItemPickUp>().item);        // 충돌 물체 아이템 인벤토리에 획득
                 Destroy(hitInfo.transform.gameObject);          // 아이템 게임오브젝트 제거
                 InfoDisappear();                                // 아이템 획득시 아이템 정보 비활성화
+            }
+        }
+    }
+
+    private void CanComputerPowerOn()       // 컴퓨터 전원 On 해주는 함수
+    {
+        if (lookComputer)         // 컴퓨터를 바라볼 시
+        {
+            if (hitInfo.transform != null)       // Raycast광선에 충돌 물체가 있다면
+            {
+                if(!hitInfo.transform.GetComponent<ComputerKit>().isPowerOn)    // 컴퓨터 전원이 꺼져있을때
+                {
+                    hitInfo.transform.GetComponent<ComputerKit>().PowerOn();        // 컴퓨터 전원 On
+                    InfoDisappear();                     // 컴퓨터 전원 정보 비활성화
+                }
             }
         }
     }
@@ -155,6 +175,8 @@ public class ActionController : MonoBehaviour
                 MeatInfoAppear();                           // 고기 해체 정보 활성화
             else if (hitInfo.transform.tag == "Fire")       // 불이면
                 FireInfoAppear();       //불 조리 액션정보창 활성화
+            else if (hitInfo.transform.tag == "Computer")
+                ComputerInfoAppear();   // 컴퓨터 액션정보창 활성화
             else
                 InfoDisappear();        // 액션정보창 비활성화
         }
@@ -169,6 +191,7 @@ public class ActionController : MonoBehaviour
         pickupActivated = false;
         dissolveActivated = false;
         fireLookActivated = false;
+        lookComputer = false;
     }
 
     private void ItemInfoAppear()           // 아이템 액션정보창 활성화
@@ -200,11 +223,25 @@ public class ActionController : MonoBehaviour
         }
     }
 
+    private void ComputerInfoAppear()           // 컴퓨터 액션정보창 활성화
+    {
+        // 컴퓨터 전원이 꺼져있을때
+        if(!hitInfo.transform.GetComponent<ComputerKit>().isPowerOn)
+        {
+            Reset();                            // 상태변수 false로 리셋
+            lookComputer = true;                      //  컴퓨터를 바라보고 있을때
+            actionText.gameObject.SetActive(true);       // 컴퓨터 전원 정보 활성화
+            actionText.text = "컴퓨터 가동 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
+        }
+    }
+
+
     private void InfoDisappear()            // (아이템 , 고기해체)액션정보창 비활성화
     {
-        pickupActivated = false;                          // 아이템 줍기 불가능
-        dissolveActivated = false;                        // 고기 해체 불가능
-        fireLookActivated = false;           // 불을 바라보고 있음
+        pickupActivated = false;                    // 아이템 줍기 불가능
+        dissolveActivated = false;                  // 고기 해체 불가능
+        fireLookActivated = false;                  // 불을 바라보고 있음
+        lookComputer = false;                       //  컴퓨터를 바라보지 않을때
         actionText.gameObject.SetActive(false);           // 아이템 정보 비활성화
     }
 }
