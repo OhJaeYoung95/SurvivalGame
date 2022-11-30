@@ -10,12 +10,10 @@ public class ActionController : MonoBehaviour
 
     // 상태변수
     private bool pickupActivated = false;   // 아이템 습득 가능할 시 true
-
     private bool dissolveActivated = false;     // 고기 해체 가능할 시 true
     private bool isDissolving = false;          // 고기 해체 중에는 true
-
-    private bool fireLookActivated = false;     // 불을 근접해서 바라볼시 true
-
+    private bool fireLookActivated = false;     // 불을 근접해서 바라볼 시 true
+    private bool lookArchemyTable = false;      // 연금 테이블을 바라볼 시 true
     private bool lookComputer = false;          // 컴퓨터를 바라볼 시 true
 
     private RaycastHit hitInfo;         // 충돌체 정보 저장
@@ -57,6 +55,7 @@ public class ActionController : MonoBehaviour
             CanMeat();                      // 고기 해체 함수
             CanDropFire();                  // 불에 고기 떨구는 함수
             CanComputerPowerOn();           // 컴퓨터 전원 On 해주는 함수
+            CanArchemyTableOpen();          // 연금창 열어주는 함수
         }
     }
 
@@ -88,6 +87,20 @@ public class ActionController : MonoBehaviour
             }
         }
     }
+
+    private void CanArchemyTableOpen()       // 연금창 열어주는 함수
+    {
+        if (lookArchemyTable)         // 연금 테이블을 바라볼 시
+        {
+            if (hitInfo.transform != null)       // Raycast광선에 충돌 물체가 있다면
+            {
+                hitInfo.transform.GetComponent<ArchemyTable>().Window();      // 아이템 연금창 활성화, 비활성화
+                InfoDisappear();                     // 아이템 연금창 정보 비활성화
+
+            }
+        }
+    }
+
 
     private void CanMeat()      // 고기 해체 함수
     {
@@ -177,6 +190,8 @@ public class ActionController : MonoBehaviour
                 FireInfoAppear();       //불 조리 액션정보창 활성화
             else if (hitInfo.transform.tag == "Computer")
                 ComputerInfoAppear();   // 컴퓨터 액션정보창 활성화
+            else if (hitInfo.transform.tag == "ArchemyTable")
+                ArchemyInfoAppear();    // 연금술 액션정보창 활성화
             else
                 InfoDisappear();        // 액션정보창 비활성화
         }
@@ -234,6 +249,13 @@ public class ActionController : MonoBehaviour
             actionText.text = "컴퓨터 가동 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
         }
     }
+    private void ArchemyInfoAppear()           // 컴퓨터 액션정보창 활성화
+    {
+        Reset();                                     // 상태변수 false로 리셋
+        lookArchemyTable = true;                     //  연금 테이블을 바라보고 있을때
+        actionText.gameObject.SetActive(true);       // 연금 테이블 정보 활성화
+        actionText.text = "연금 테이블 조작 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
+    }
 
 
     private void InfoDisappear()            // (아이템 , 고기해체)액션정보창 비활성화
@@ -242,6 +264,7 @@ public class ActionController : MonoBehaviour
         dissolveActivated = false;                  // 고기 해체 불가능
         fireLookActivated = false;                  // 불을 바라보고 있음
         lookComputer = false;                       //  컴퓨터를 바라보지 않을때
+        lookArchemyTable = false;                   //  연금 테이블을 바라보지 않을때
         actionText.gameObject.SetActive(false);           // 아이템 정보 비활성화
     }
 }

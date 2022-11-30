@@ -7,10 +7,14 @@ public class GameManager : MonoBehaviour
     public static bool canPlayerMove = true;        // 플레이어 움직임 제어 활성화 여부
 
     public static bool isOpenInventory = false;     // 인벤토리 활성화 여부
+    public static bool isOpenCraftManual = false;   // 건축 메뉴창 활성화 여부
+    public static bool isOpenArchemyTable = false;  // 연금 테이블 창 활성화 여부
+    public static bool isOnComputer = false;     // 컴퓨터 창 활성화 여부
 
     void Update()
     {
-        if (isOpenInventory )        // 인벤토리 활성화시
+        // 인벤토리 활성화시, 컴퓨터 전원 On시, 건축 메뉴창 활성화시, 연금 테이블 창 활성화시
+        if (isOpenInventory || isOnComputer || isOpenCraftManual || isOpenArchemyTable)
         {
             // 마우스 커서 원래대로, Cursor.visible = true 도 포함
             Cursor.lockState = CursorLockMode.None;

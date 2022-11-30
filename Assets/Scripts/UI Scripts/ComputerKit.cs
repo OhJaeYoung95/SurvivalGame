@@ -70,18 +70,14 @@ public class ComputerKit : MonoBehaviour
 
     public void PowerOn()       // 컴퓨터 전원 On
     {
-        // 커서 상태, 원래 상태로
-        Cursor.lockState = CursorLockMode.None;     // 평소 상태
-        Cursor.visible = true;          // 마우스 커서 활성화
+        GameManager.isOnComputer = true;     // 커서 활성화
         isPowerOn = true;               // 전원 On 상태
         go_BaseUI.SetActive(true);
     }
 
     private void PowerOff()      // 컴퓨터 전원 Off
     {
-        // 커서 상태, 커서가 사라지면서 가운데 고정
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;         // 마우스 커서 비활성화
+        GameManager.isOnComputer = false;     // 커서 비활성화
         isPowerOn = false;              // 전원 Off 상태
         theToolTip.HideToolTip();       // 툴팁 비활성화
         go_BaseUI.SetActive(false);
