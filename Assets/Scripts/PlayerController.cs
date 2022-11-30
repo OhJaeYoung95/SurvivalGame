@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isActivated)         // 활성화중에만 실행되도록
+        if(isActivated && GameManager.canPlayerMove)         // 활성화, 플레이어 움직임 제어 활성화
         {
             IsGround();
             TryJump();
@@ -91,11 +91,8 @@ public class PlayerController : MonoBehaviour
             TryCrouch();
             Move();
             MoveCheck();
-            if (!Inventory.inventoryActivated)       // 인벤토리 비활성화시에만
-            {
-                CameraRotation();
-                CharacterRotation();
-            }
+            CameraRotation();
+            CharacterRotation();
         }
     }
 

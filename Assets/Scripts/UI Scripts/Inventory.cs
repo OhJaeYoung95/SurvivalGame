@@ -54,17 +54,13 @@ public class Inventory : MonoBehaviour
 
     private void OpenInventory()        // 인벤토리 활성화
     {
-        // 커서 상태, 원래 상태로
-        Cursor.lockState = CursorLockMode.None;     // 평소 상태
-        Cursor.visible = true;          // 마우스 커서 활성화
+        GameManager.isOpenInventory = true;     // 커서 활성화
         go_InventoryBase.SetActive(true);
     }
 
     private void CloseInventory()       // 인벤토리 비활성화
     {
-        // 커서 상태, 커서가 사라지면서 시점 가운데 고정
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;     // 마우스 커서 비활성화
+        GameManager.isOpenInventory = false;     // 커서 비활성화
         go_InventoryBase.SetActive(false);
     }
 
@@ -82,7 +78,8 @@ public class Inventory : MonoBehaviour
     }
     public void PutSlot(Slot[] _slots, Item _item, int _count)     // 아이템 획득, _count값 없으면 default값으로 1이 들어간다
     {
-        if (Item.ItemType.Equipment != _item.itemType)       // 아이템 타입이 장비가 아니라면
+        if (Item.ItemType.Equipment != _item.itemType     // 아이템 타입이 장비가 아니라면
+            && Item.ItemType.Kit != _item.itemType)       // 아이템 타입이 키트가 아니라면
         {
             for (int i = 0; i < _slots.Length; i++)
             {

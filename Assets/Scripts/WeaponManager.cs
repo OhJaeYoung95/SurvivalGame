@@ -88,7 +88,7 @@ public class WeaponManager : MonoBehaviour
         isChangeWeapon = false;
     }
 
-    private void CancelPreWeaponAction()    // 실행중이던 액션 취소해주는 함수
+    private void CancelPreWeaponAction()    // 실행중이던 무기액션 취소해주는 함수
     {
         switch(currentWeaponType)
         {
@@ -99,6 +99,8 @@ public class WeaponManager : MonoBehaviour
                 break;
             case "HAND":
                 HandController.isActivate = false;      // 비활성화
+                if (HandController.currentKit != null)       // 키트를 들고 있을때
+                    theHandController.Cancel();     // 외부에서 키트 미리보기 초기화해주는 함수
                 if (QuickSlotController.go_HandItem != null)        // 손으로 교체시 아이템이 있다면
                     Destroy(QuickSlotController.go_HandItem);       // 아이템 제거
                 break;

@@ -164,8 +164,9 @@ public class QuickSlotController : MonoBehaviour
         {
             if (quickSlots[selectedSlot].item.itemType == Item.ItemType.Equipment)      // 퀵슬롯에 아이템이 장비라면
                 StartCoroutine(theWeaponManager.ChangeWeaponCoroutine(quickSlots[selectedSlot].item.weaponType, quickSlots[selectedSlot].item.itemName));       // 퀵슬롯에 해당하는 무기로 교체
-            else if (quickSlots[selectedSlot].item.itemType == Item.ItemType.Used)      // 퀵슬롯에 아이템이 소모품이라면
-                ChangeHand(quickSlots[selectedSlot].item);
+            else if (quickSlots[selectedSlot].item.itemType == Item.ItemType.Used ||    // 퀵슬롯에 아이템이 소모품이라면
+                quickSlots[selectedSlot].item.itemType == Item.ItemType.Kit)      // 퀵슬롯에 아이템이 키트라면
+                ChangeHand(quickSlots[selectedSlot].item);      // 퀵슬롯에 해당하는 아이템을 든 손으로 교체
             else
                 ChangeHand();               // 맨손으로 교체
         }
@@ -179,16 +180,21 @@ public class QuickSlotController : MonoBehaviour
     {
         StartCoroutine(theWeaponManager.ChangeWeaponCoroutine("HAND", "맨손"));   // 맨손으로 교체
 
-        if (_item != null)
-            StartCoroutine(HandItemCoroutine());
+        if (_item != null)      // 아이템이 있을때
+        {
+            StartCoroutine(HandItemCoroutine(_item));
+        }
     }
 
-    IEnumerator HandItemCoroutine()
+    IEnumerator HandItemCoroutine(Item _item)
     {
         // 람다식 : 다음 조건을 만족해야지 넘어간다
         // () => 
         HandController.isActivate = false;      // 손 비활성화
         yield return new WaitUntil(() => HandController.isActivate);      // 손이 활성화 될때까지 기다린다
+
+        if (_item.itemType == Item.ItemType.Kit)    // 아이템 타입이 키트일때
+            HandController.currentKit = _item;
 
         go_HandItem = Instantiate(quickSlots[selectedSlot].item.itemPrefab, tf_ItemPos.position, tf_ItemPos.rotation);
         go_HandItem.GetComponent<Rigidbody>().isKinematic = true;       // 중력 영향x
