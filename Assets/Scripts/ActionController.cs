@@ -249,12 +249,16 @@ public class ActionController : MonoBehaviour
             actionText.text = "컴퓨터 가동 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
         }
     }
-    private void ArchemyInfoAppear()           // 컴퓨터 액션정보창 활성화
+    private void ArchemyInfoAppear()           // 연금 테이블 액션정보창 활성화
     {
-        Reset();                                     // 상태변수 false로 리셋
-        lookArchemyTable = true;                     //  연금 테이블을 바라보고 있을때
-        actionText.gameObject.SetActive(true);       // 연금 테이블 정보 활성화
-        actionText.text = "연금 테이블 조작 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
+        // 연금 테이블 액션정보창이 비활성화일때 
+        if(!hitInfo.transform.GetComponent<ArchemyTable>().GetIsOpen())
+        {
+            Reset();                                     // 상태변수 false로 리셋
+            lookArchemyTable = true;                     //  연금 테이블을 바라보고 있을때
+            actionText.gameObject.SetActive(true);       // 연금 테이블 정보 활성화
+            actionText.text = "연금 테이블 조작 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
+        }
     }
 
 
