@@ -13,6 +13,12 @@ public class PlayerController : MonoBehaviour
     private float runSpeed;             // 달리기 속도 변수
     [SerializeField]
     private float crouchSpeed;          // 앉아서 움직이는 속도 변수
+    [SerializeField]
+    private float swimSpeed;            // 수영 속도
+    [SerializeField]
+    private float swimFastSpeed;        // 빠른수영 속도
+    [SerializeField]
+    private float upSwimSpeed;          // 위로 수영하는 속도
     private float applySpeed;           // 실제 속도에 적용하는 변수
 
     // 점프 변수
@@ -85,14 +91,29 @@ public class PlayerController : MonoBehaviour
     {
         if(isActivated && GameManager.canPlayerMove)         // 활성화, 플레이어 움직임 제어 활성화
         {
+            WaterCheck();
             IsGround();
             TryJump();
-            TryRun();
+            if(!GameManager.isWater)
+            {
+                TryRun();
+            }
             TryCrouch();
             Move();
             MoveCheck();
             CameraRotation();
             CharacterRotation();
+        }
+    }
+
+    private void WaterCheck()       // 물속인지 체크하는 함수
+    {
+        if(GameManager.isWater)     // 물속이라면
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift))    // 좌측쉬프트 키를 누르면
+                applySpeed = swimFastSpeed;     // 빠른 수영속도 대입
+            else                                // 좌측쉬프트 키를 안누르고 있으면
+                applySpeed = swimSpeed;         // 수영속도 대입
         }
     }
 
@@ -155,11 +176,20 @@ public class PlayerController : MonoBehaviour
         theCrosshair.JumpingAnimation(!isGround);       // 땅에 붙어있지 않을때 달릴때의 크로스헤어 애니메이션을 실행
     }
     private void TryJump() // 점프 입력 & 점프 조건함수
-    {
-        if(Input.GetKeyDown(KeyCode.Space) && isGround && theStatusController.GetCurrentSP() > 0)
+    {   // 스테미너가 있을때 && 땅에 닿아있을때 && 스페이스바를 누른다면 && 물속에 없을때
+        if(Input.GetKeyDown(KeyCode.Space) && isGround && theStatusController.GetCurrentSP() > 0 && !GameManager.isWater)
         {
-            Jump();
+            Jump();     // 점프하기
+        }   // 물속에 있을때 && 스페이스바를 누른다면
+        else if(Input.GetKey(KeyCode.Space) && GameManager.isWater) 
+        {
+            UpSwim();   //  위로 수영하기
         }
+    }
+    
+    private void UpSwim()   // 위로 수영하는 함수
+    {   // 위로 이동
+        myRigid.velocity = transform.up * upSwimSpeed;
     }
 
     private void Jump() // 점프

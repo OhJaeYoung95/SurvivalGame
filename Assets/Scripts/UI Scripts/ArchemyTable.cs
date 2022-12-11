@@ -10,6 +10,9 @@ public class ArchemyItem            // 연금 아이템
     public string itemDesc;         // 연금 아이템 설명
     public Sprite itemImage;        // 연금 아이템 이미지
 
+    public string[] needItemName;       // 필요한 아이템 이름들
+    public int[] needItemNumber;        // 필요한 아이템 개수들
+
     public float itemCraftingTime;      // 포션 제조에 걸리는 시간 (5초, 10초, 100초)
 
     public GameObject go_ItemPrefab;    // 연금 아이템 프리팹
@@ -53,8 +56,32 @@ public class ArchemyTable : MonoBehaviour
     [SerializeField]
     private Image[] image_CraftingItems;    // 대기열 슬롯에 있는 아이템 이미지들
 
+
+    // 필요한 컴포넌트
+    [SerializeField]
+    private ArchemyToolTip theToolTip;      // UI 툴팁창을 다루기 위한 컴포넌트
+    private AudioSource theAudio;       // 효과음 재생을 위한 컴포넌트
+    private Inventory theInven;         // 필요한 아이템 개수(재료)에 따라서 차감을 위한 컴포넌트
+    [SerializeField]
+    private AudioClip sound_ButtonClick;        // 버튼 클릭 효과음
+    [SerializeField]
+    private AudioClip sound_Beep;               // 가동 실패(재료 부족) 효과음
+    [SerializeField]
+    private AudioClip sound_Activate;           // 가동 효과음
+    [SerializeField]
+    private AudioClip sound_ExitItem;           // 아이템 배출 효과음
+
+
+    private void PlaySE(AudioClip _clip)        // 효과음 재생 함수
+    {
+        theAudio.clip = _clip;
+        theAudio.Play();
+    }
+
     void Start()
     {
+        theInven = FindObjectOfType<Inventory>();
+        theAudio = GetComponent<AudioSource>();
         ClaerSlot();        // 아이템 슬롯 이미지 초기화
         PageSetting();      // 페이지 슬롯 이미지 설정
     }
@@ -108,6 +135,7 @@ public class ArchemyTable : MonoBehaviour
 
     private void DequeueItem()      // 대기열에서 나온 아이템 함수
     {
+        PlaySE(sound_Activate);      // 가동 효과음 재생
         isCrafting = true;        // 제작중
         // 현재 제작중인 연금 아이템에 대기열에서 나온 아이템을 대입
         currentCraftingItem = archemyItemQueue.Dequeue();       
@@ -160,18 +188,45 @@ public class ArchemyTable : MonoBehaviour
 
     public void ButtonClick(int _buttonNum)         // 연금창 버튼 클릭시 발생하는 함수
     {
+        PlaySE(sound_ButtonClick);      // 버튼 클릭 효과음 재생
+
         if (archemyItemQueue.Count < 3)         // 대기열 길이안이면
         {
             // 페이지에 해당하는 슬롯 버튼을 누르기 위한 변수
             // 최대페이지 + 버튼번호 = 현재 페이지에 해당하는 슬롯버튼 번호
             int archemyItemArrayNumber = _buttonNum + ((page - 1) * theNumberOfSlot);
 
+            // 인벤토리에서 재료 검색
+            for (int i = 0; i < archemyItems[archemyItemArrayNumber].needItemName.Length; i++)
+            {
+                // 해당 슬롯 제작을 위해 필요한 인벤토리에 있는 아이템의 개수가
+                // 제작에 필요한 아이템의 개수 보다 작을때
+                // 재료가 부족할 때
+                if(theInven.GetItemCount(archemyItems[archemyItemArrayNumber].needItemName[i]) 
+                    < archemyItems[archemyItemArrayNumber].needItemNumber[i])
+                {
+                    PlaySE(sound_Beep);     // 가동 실패(재료 부족) 효과음 재생
+                    return;
+                }
+            }
+
+            // 인벤토리 재료 감산
+            for (int i = 0; i < archemyItems[archemyItemArrayNumber].needItemName.Length; i++)
+            {
+                theInven.SetItemCount(archemyItems[archemyItemArrayNumber].needItemName[i], archemyItems[archemyItemArrayNumber].needItemNumber[i]);
+            }
+
+            // 제작 시작
             // 대기열에 버튼을 누른 아이템을 합류
             archemyItemQueue.Enqueue(archemyItems[archemyItemArrayNumber]);
 
             // 대기열 아이템 활성화, 이미지 대입
             image_CraftingItems[archemyItemQueue.Count].gameObject.SetActive(true);
             image_CraftingItems[archemyItemQueue.Count].sprite = archemyItems[archemyItemArrayNumber].itemImage;
+        }
+        else
+        {
+            PlaySE(sound_Beep);     // 가동 실패(재료 부족) 효과음 재생
         }
     }
 
@@ -180,12 +235,16 @@ public class ArchemyTable : MonoBehaviour
         isCrafting = false;     // 제작이 끝남
         image_CraftingItems[0].gameObject.SetActive(false);     // (아이템이 생산완료)제작이 끝나면서 0번째 이미지 비활성화
 
+        PlaySE(sound_ExitItem);     // 아이템 배출 효과음
+
         // 연금 테이블 생성 위치에 해당 연금 아이템 생성
         Instantiate(currentCraftingItem.go_ItemPrefab, tf_PotionAppearPos.position, Quaternion.identity);
     }
 
     public void UpButton()      // 페이지 업버튼 함수
     {
+        PlaySE(sound_ButtonClick);      // 버튼 클릭 효과음 재생
+
         if (page != 1)   // 페이지가 첫번째 장이 아니라면
             page--;     // 페이지 번호 -1
         else            // 아이템 길이 / 슬롯 최대 갯수 = 페이지 갯수 + 1 => 최대 페이지
@@ -196,6 +255,8 @@ public class ArchemyTable : MonoBehaviour
     }
     public void DownButton()    // 페이지 다운버튼 함수
     {
+        PlaySE(sound_ButtonClick);      // 버튼 클릭 효과음 재생
+
         if (page < 1 + (archemyItems.Length / theNumberOfSlot))  // 최대 페이지 보다 작을때
             page++;     // 페이지 번호 +1
         else        // 최대 페이지를 넘을때 첫번째 장으로 이동
@@ -236,4 +297,16 @@ public class ArchemyTable : MonoBehaviour
         }
     }
 
+    public void ShowToolTip(int _buttonNum)     // UI 툴팁창 활성화 함수
+    {
+        // 페이지에 해당하는 슬롯 번호
+        int _archemyItemArrayNumber = _buttonNum + ((page - 1) * theNumberOfSlot);
+        // UI 툴팁창 활성화(해당 슬롯의 아이템 이름, 필요 개수 정보)
+        theToolTip.ShowToolTip(archemyItems[_archemyItemArrayNumber].needItemName, archemyItems[_archemyItemArrayNumber].needItemNumber);
+    }
+
+    public void HideToolTip()            // UI 툴팁창 비활성화 함수
+    {
+        theToolTip.HideToolTip();
+    }
 }

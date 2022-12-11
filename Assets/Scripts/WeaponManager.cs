@@ -124,4 +124,20 @@ public class WeaponManager : MonoBehaviour
         else if(_type == "PICKAXE")
             thePickaxeController.CloseWeaponChange(pickaxeDictionary[_name]);
     }
+
+    public IEnumerator WeaponInCoroutine()         // 무기 꺼내는 코루틴
+    {
+        isChangeWeapon = true;
+        currentWeaponAnim.SetTrigger("Weapon_Out");     // 손을 집어넣어서 무기를 꺼내는 애니메이션 실행
+
+        yield return new WaitForSeconds(changeWeaponDelayTime);
+
+        currentWeapon.gameObject.SetActive(false);
+    }
+    public void WeaponOut()         // 무기 집어넣는 코루틴
+    {
+        isChangeWeapon = false;
+
+        currentWeapon.gameObject.SetActive(true);
+    }
 }

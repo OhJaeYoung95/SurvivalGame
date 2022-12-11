@@ -38,7 +38,7 @@ public class WeaponSway : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!Inventory.inventoryActivated && isActivated)       // 인벤토리 비활성화시에만 && 무기 흔들림 활성화시
+        if(GameManager.canPlayerMove && isActivated)       // 캐릭터가 움직일 활성화시 && 무기 흔들림 활성화시
             TrySway();
     }
 

@@ -1,0 +1,1 @@
+{"playerPos":{"x":35.98439025878906,"y":1.0000001192092896,"z":25.13872718811035},"playerRot":{"x":0.0,"y":100.19988250732422,"z":0.0},"invenSlotsArrayNumber":[10],"invenSlotsItemName":["Potion Green"],"invenSlotsItemNumber":[1],"quickSlotsArrayNumber":[2],"quickSlotsItemName":["Rock"],"quickSlotsItemNumber":[1]}

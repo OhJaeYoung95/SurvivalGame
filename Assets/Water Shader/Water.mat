@@ -5,7 +5,8 @@ Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Water
   m_Shader: {fileID: 4800000, guid: 4b4aa024605516042971f1a64c84b109, type: 3}
   m_ShaderKeywords: 
@@ -87,3 +88,4 @@ Material:
     - _Color: {r: 0.088287644, g: 0.25440663, b: 0.6037736, a: 1}
     - _Color2: {r: 0.3972499, g: 0.5891142, b: 0.745283, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []

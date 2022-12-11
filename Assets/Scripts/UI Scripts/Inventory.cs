@@ -21,6 +21,25 @@ public class Inventory : MonoBehaviour
     private bool isNotPut;                          // 인벤토리든 퀵슬롯이든 꽉 찼을경우
     private int slotNumber;                         // 슬롯넘버
 
+    public Slot[] GetSlots() { return slots; }      // 인벤토리 슬롯정보 받기
+    public Slot[] GetQuickSlots() { return quickslots; }    // 퀵슬롯정보 받기
+
+    [SerializeField]
+    private Item[] items;       // 아이템 정보 받기
+
+    public void LoadToInvenSlots(int _arrayNum, string _itemName, int _itemNum)      // 인벤에 아이템 저장해주는 함수
+    {       // 아이템을 전부 비교해 인벤토리에 아이템 넣어준다
+        for (int i = 0; i < items.Length; i++)
+            if (items[i].itemName == _itemName)
+                slots[_arrayNum].AddItem(items[i], _itemNum);
+    }    
+    public void LoadToQuickSlots(int _arrayNum, string _itemName, int _itemNum)      // 퀵슬롯에 아이템 저장해주는 함수
+    {       // 아이템을 전부 비교해 인벤토리에 아이템 넣어준다
+        for (int i = 0; i < items.Length; i++)
+            if (items[i].itemName == _itemName)
+                quickslots[_arrayNum].AddItem(items[i], _itemNum);
+    }
+
     // Start is called before the first frame update
     void Start()
     {

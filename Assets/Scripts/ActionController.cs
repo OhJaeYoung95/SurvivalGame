@@ -15,6 +15,7 @@ public class ActionController : MonoBehaviour
     private bool fireLookActivated = false;     // 불을 근접해서 바라볼 시 true
     private bool lookArchemyTable = false;      // 연금 테이블을 바라볼 시 true
     private bool lookComputer = false;          // 컴퓨터를 바라볼 시 true
+    private bool lookActivatedTrap = false;     // 작동된 트랩을 바라볼 시 true
 
     private RaycastHit hitInfo;         // 충돌체 정보 저장
 
@@ -56,6 +57,7 @@ public class ActionController : MonoBehaviour
             CanDropFire();                  // 불에 고기 떨구는 함수
             CanComputerPowerOn();           // 컴퓨터 전원 On 해주는 함수
             CanArchemyTableOpen();          // 연금창 열어주는 함수
+            CanReInstallTrap();             // 트랩 재설치 함수
         }
     }
 
@@ -100,6 +102,19 @@ public class ActionController : MonoBehaviour
             }
         }
     }
+
+    private void CanReInstallTrap()       // 트랩 재설치 함수
+    {
+        if (lookActivatedTrap)         // 작동된 트랩을 바라볼 시
+        {
+            if (hitInfo.transform != null)       // Raycast광선에 충돌 물체가 있다면
+            {
+                hitInfo.transform.GetComponent<DeadTrap>().ReInstall();      // 작동된 트랩 재설치
+                InfoDisappear();                     // 작동된 트랩 액셩정보창 비활성화
+            }
+        }
+    }
+
 
 
     private void CanMeat()      // 고기 해체 함수
@@ -192,6 +207,8 @@ public class ActionController : MonoBehaviour
                 ComputerInfoAppear();   // 컴퓨터 액션정보창 활성화
             else if (hitInfo.transform.tag == "ArchemyTable")
                 ArchemyInfoAppear();    // 연금술 액션정보창 활성화
+            else if (hitInfo.transform.tag == "Trap")
+                TrapInfoAppear();       // 작동된 트랩 액션정보창 활성화
             else
                 InfoDisappear();        // 액션정보창 비활성화
         }
@@ -213,7 +230,7 @@ public class ActionController : MonoBehaviour
     {
         Reset();                            // 상태변수 false로 리셋
         pickupActivated = true;                      // 아이템 줍기 가능
-        actionText.gameObject.SetActive(true);       // 아이템 정보 활성화
+        actionText.gameObject.SetActive(true);       // 아이템 액션정보 활성화
         actionText.text = hitInfo.transform.GetComponent<ItemPickUp>().item.itemName + " 획득" + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
     }
     private void MeatInfoAppear()           // 고기해체 액션정보창 활성화
@@ -222,7 +239,7 @@ public class ActionController : MonoBehaviour
         {
             Reset();                                // 상태변수 false로 리셋
             dissolveActivated = true;                      // 고기 해체 가능
-            actionText.gameObject.SetActive(true);       // 아이템 정보 활성화
+            actionText.gameObject.SetActive(true);       // 고기 액션정보 활성화
             actionText.text = hitInfo.transform.GetComponent<Animal>().animalName + " 해체하기 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 동물 이름 해체표시, 텍스트에 색 입힘
         }
     }
@@ -245,19 +262,30 @@ public class ActionController : MonoBehaviour
         {
             Reset();                            // 상태변수 false로 리셋
             lookComputer = true;                      //  컴퓨터를 바라보고 있을때
-            actionText.gameObject.SetActive(true);       // 컴퓨터 전원 정보 활성화
+            actionText.gameObject.SetActive(true);       // 컴퓨터 전원 액션정보 활성화
             actionText.text = "컴퓨터 가동 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
         }
     }
     private void ArchemyInfoAppear()           // 연금 테이블 액션정보창 활성화
     {
-        // 연금 테이블 액션정보창이 비활성화일때 
+        // 연금 테이블 정보창이 비활성화일때 
         if(!hitInfo.transform.GetComponent<ArchemyTable>().GetIsOpen())
         {
             Reset();                                     // 상태변수 false로 리셋
             lookArchemyTable = true;                     //  연금 테이블을 바라보고 있을때
-            actionText.gameObject.SetActive(true);       // 연금 테이블 정보 활성화
+            actionText.gameObject.SetActive(true);       // 연금 테이블 액션정보 활성화
             actionText.text = "연금 테이블 조작 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
+        }
+    }
+    private void TrapInfoAppear()           // 작동된 트랩 액션정보창 활성화
+    {
+        // 트랩이 작동되었을때
+        if(hitInfo.transform.GetComponent<DeadTrap>().GetIsActivated())
+        {
+            Reset();                                     // 상태변수 false로 리셋
+            lookActivatedTrap = true;                    //  작동된 트랩을 바라보고 있을때
+            actionText.gameObject.SetActive(true);       // 작동된 트랩 액션정보 활성화
+            actionText.text = "함정 재설치 " + "<color=yellow>" + "(E)" + "</color>";        // 해당 아이템 이름 획득표시, 텍스트에 색 입힘
         }
     }
 
@@ -267,8 +295,9 @@ public class ActionController : MonoBehaviour
         pickupActivated = false;                    // 아이템 줍기 불가능
         dissolveActivated = false;                  // 고기 해체 불가능
         fireLookActivated = false;                  // 불을 바라보고 있음
-        lookComputer = false;                       //  컴퓨터를 바라보지 않을때
-        lookArchemyTable = false;                   //  연금 테이블을 바라보지 않을때
+        lookComputer = false;                       // 컴퓨터를 바라보지 않을때
+        lookArchemyTable = false;                   // 연금 테이블을 바라보지 않을때
+        lookActivatedTrap = false;                  // 작동된 트랩을 바라보지 않을때 
         actionText.gameObject.SetActive(false);           // 아이템 정보 비활성화
     }
 }

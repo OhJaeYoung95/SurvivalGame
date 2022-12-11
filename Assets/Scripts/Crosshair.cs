@@ -18,37 +18,55 @@ public class Crosshair : MonoBehaviour
 
     public void WalkingAnimation(bool _flag)        // 걷고 있을때 크로스헤어 애니메이션 실행
     {
-        WeaponManager.currentWeaponAnim.SetBool("Walk", _flag);
-        animator.SetBool("Walking", _flag);
+        if(!GameManager.isWater)
+        {
+            WeaponManager.currentWeaponAnim.SetBool("Walk", _flag);
+            animator.SetBool("Walking", _flag);
+        }
     }
     public void RunningAnimation(bool _flag)        // 뛰고 있을때 크로스헤어 애니메이션 실행
     {
-        WeaponManager.currentWeaponAnim.SetBool("Run", _flag);
-        animator.SetBool("Running", _flag);
+        if (!GameManager.isWater)
+        {
+            WeaponManager.currentWeaponAnim.SetBool("Run", _flag);
+            animator.SetBool("Running", _flag);
+        }
     }
     public void JumpingAnimation(bool _flag)        // 뛰고 있을때 크로스헤어 애니메이션 실행
     {
-        animator.SetBool("Running", _flag);
+        if (!GameManager.isWater)
+        {
+            animator.SetBool("Running", _flag);
+        }
     }
     public void CrouchingAnimation(bool _flag)      // 앉았을때 크로스헤어 애니메이션 실행
     {
-        animator.SetBool("Crouching", _flag);
+        if (!GameManager.isWater)
+        {
+            animator.SetBool("Crouching", _flag);
+        }
     }    
     public void FineSightAnimation(bool _flag)      // 앉았을때 크로스헤어 애니메이션 실행
     {
-        animator.SetBool("FineSight", _flag);
+        if (!GameManager.isWater)
+        {
+            animator.SetBool("FineSight", _flag);
+        }
     }
 
     public void FireAnimation()                     // 총을 사격하는 자세에 따른 크로스헤어 애니메이션 실행
     {
-        if(animator.GetBool("Walking"))             // 걸을때
-            animator.SetTrigger("Walk_Fire");
+        if (!GameManager.isWater)
+        {
+            if (animator.GetBool("Walking"))             // 걸을때
+                animator.SetTrigger("Walk_Fire");
 
-        else if(animator.GetBool("Crouching"))      // 앉을때
-            animator.SetTrigger("Crouch_Fire");
+            else if (animator.GetBool("Crouching"))      // 앉을때
+                animator.SetTrigger("Crouch_Fire");
 
-        else
-            animator.SetTrigger("Idle_Fire");       // 가만히 있을때
+            else
+                animator.SetTrigger("Idle_Fire");       // 가만히 있을때
+        }
     }
 
     public float GetAccuracy()          // 사격자세에 따른 총의 정확도를 얻는 함수
